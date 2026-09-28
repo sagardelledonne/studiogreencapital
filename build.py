@@ -9,7 +9,13 @@ import os, re
 BASE = "/studiogreencapital"          # prefisso degli indirizzi su GitHub Pages; "" con il dominio proprio
 SITE_URL = "https://sagardelledonne.github.io" + BASE
 IMG = BASE + "/assets/img"
-CONTACT_EMAIL = "info@studiogreencapital.it"
+CONTACT_EMAIL = "info@studiogreencapital.it"      # TODO: confermare la casella ordinaria
+PEC = "green-capital-srl@pec.it"
+PIVA = "04755500164"
+REA = "MI-2807171"
+VIA = "Via Mauro Macchi, 8"
+CITTA = "20124 Milano (MI)"
+PAYOFF = "Energy, Land, People"
 ROOT = os.path.dirname(os.path.abspath(__file__))
 import time
 V = "?v=%d" % int(time.time())
@@ -30,7 +36,8 @@ ICONS = """<svg width="0" height="0" style="position:absolute" aria-hidden="true
 <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
 </defs></svg>"""
 
-MARK = """<svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><rect x="1" y="1" width="38" height="38" rx="11" fill="none" stroke="currentColor" stroke-opacity=".35" stroke-width="1.2"/><path d="M11 29c0-9 6.5-16 18-16-1 10-7.5 16-18 16z" fill="#B08A45"/><path d="M11 29c3.5-5.5 8-10 13.5-12.5" fill="none" stroke="#0A1B14" stroke-width="1.4" stroke-linecap="round" stroke-opacity=".8"/></svg>"""
+MARK = ('<img class="mark light" src="%(b)s/assets/img/simbolo-chiaro.webp" width="420" height="370" alt="" loading="eager">'
+        '<img class="mark dark" src="%(b)s/assets/img/simbolo.webp" width="420" height="370" alt="" loading="eager">') % {"b": BASE}
 
 def ico(name):
     return '<svg aria-hidden="true"><use href="#%s"/></svg>' % name
@@ -93,7 +100,7 @@ NAV = [
 ]
 
 def brand(tag="a"):
-    return '<%s class="brand" href="%s/" aria-label="Studio Green Capital — home">%s<span><b>Studio Green Capital</b><small>Strategic Energy Advisory</small></span></%s>' % (tag, BASE, MARK, tag)
+    return '<%s class="brand" href="%s/" aria-label="Studio Green Capital — home">%s<span><b>Studio Green Capital</b><small>Energy, Land, People</small></span></%s>' % (tag, BASE, MARK, tag)
 
 def header(path):
     items = []
@@ -121,7 +128,7 @@ def header(path):
 <div class="menu" id="menu" aria-label="Menu">
   <div class="mhead">%s<button class="close" id="menuClose" aria-label="Chiudi il menu">%s</button></div>
   <nav>%s</nav>
-  <p class="mfoot">Studio Green Capital SRL · Strategic Energy Advisory<br><a href="mailto:%s">%s</a></p>
+  <p class="mfoot">Studio Green Capital SRL · Energy, Land, People<br><a href="mailto:%s">%s</a></p>
 </div>
 """ % (brand(), "".join(items), BASE, ico("i-menu"), brand("span"), ico("i-x"), "".join(mob), CONTACT_EMAIL, CONTACT_EMAIL)
 
@@ -133,21 +140,21 @@ def footer():
     <div>%s<p>Società di consulenza energetica indipendente per imprese e realtà industriali. Contratti, approvvigionamento, produzione propria: un solo interlocutore, remunerato sui risultati.</p></div>
     <div><h4>Studio</h4><nav><a href="%(b)s/chi-siamo/">Chi siamo</a><a href="%(b)s/metodo/">Il metodo</a><a href="%(b)s/risultati/">Risultati</a><a href="%(b)s/contatti/">Contatti</a></nav></div>
     <div><h4>Servizi</h4><nav>%(s)s</nav></div>
-    <div><h4>Contatti</h4><nav><a href="mailto:%(m)s">%(m)s</a><a href="%(b)s/contatti/">Richiedi una valutazione</a></nav></div>
+    <div><h4>Contatti</h4><nav><a href="https://www.google.com/maps/search/?api=1&amp;query=Via+Mauro+Macchi+8+Milano" rel="noopener">%(v)s<br>%(c)s</a><a href="mailto:%(m)s">%(m)s</a><a href="mailto:%(p)s">%(p)s</a><a href="%(b)s/contatti/">Richiedi una valutazione</a></nav></div>
   </div>
   <div class="legal">
-    <span>© <span id="year">2026</span> Studio Green Capital SRL · Tutti i diritti riservati</span>
+    <span>© <span id="year">2026</span> Studio Green Capital SRL · C.F. e P.IVA %(iva)s · REA %(rea)s · Tutti i diritti riservati</span>
     <nav><a href="%(b)s/privacy/">Privacy</a><a href="%(b)s/cookie/">Cookie</a></nav>
   </div>
 </div></footer>
-""".replace("%s", brand(), 1) % {"b": BASE, "s": srv, "m": CONTACT_EMAIL}
+""".replace("%s", brand(), 1) % {"b": BASE, "s": srv, "m": CONTACT_EMAIL, "p": PEC, "v": VIA, "c": CITTA, "iva": PIVA, "rea": REA}
 
 # ------------------------------------------------------------------ pagina
 def page(path, title, desc, body, light=False):
     """path: indirizzo (es. '/chi-siamo/'). Scrive index.html nella cartella corrispondente."""
     full = BASE + path
     canon = SITE_URL + path
-    og_img = SITE_URL + "/assets/img/bosco.webp"
+    og_img = SITE_URL + "/assets/img/og.png"
     cls = ' class="on-light"' if light else ""
     html = """<!DOCTYPE html>
 <html lang="it"%s>
@@ -158,10 +165,10 @@ def page(path, title, desc, body, light=False):
 <meta name="description" content="%s">
 <link rel="canonical" href="%s">
 <meta property="og:type" content="website"><meta property="og:title" content="%s"><meta property="og:description" content="%s"><meta property="og:image" content="%s"><meta property="og:locale" content="it_IT">
-<meta name="theme-color" content="#0F2A1F">
-<link rel="icon" href="%s/assets/favicon.svg" type="image/svg+xml">
-<link rel="preload" href="%s/assets/fonts/fraunces-normal.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="%s/assets/fonts/manrope-normal.woff2" as="font" type="font/woff2" crossorigin>
+<meta name="theme-color" content="#03352A">
+<link rel="icon" href="%s/assets/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="%s/assets/favicon-180.png">
+<link rel="preload" href="%s/assets/fonts/opensans-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="%s/assets/fonts/fonts.css">
 <link rel="stylesheet" href="%s/assets/site.css%s">
 </head>
@@ -241,7 +248,7 @@ def home():
   <div class="bg"><img src="%(i)s/bosco.webp" alt="" fetchpriority="high"></div><div class="veil"></div>
   <div class="wrap">
     <div>
-      <p class="eyebrow rv in">Strategic Energy Advisory</p>
+      <p class="eyebrow rv in">Energy, Land, People</p>
       <h1 class="rv in">L’energia non si subisce. <em>Si governa.</em></h1>
       <p class="lede rv in rv-d1">Affianchiamo imprese e gruppi industriali nelle decisioni che determinano il costo dell’energia: contratti, approvvigionamento, produzione propria. Un solo interlocutore, indipendente, remunerato sui risultati.</p>
       <div class="actions rv in rv-d2"><a class="btn btn-brass" href="%(b)s/contatti/">Richiedi una valutazione %(a)s</a><a class="btn btn-ghost" href="%(b)s/metodo/">Come lavoriamo</a></div>
@@ -526,15 +533,22 @@ def contatti():
   </div>
   <div class="contact-aside rv rv-d1">
     <div class="item"><small>Email</small><a href="mailto:%(m)s">%(m)s</a></div>
+    <div class="item"><small>Sede</small><a href="https://www.google.com/maps/search/?api=1&amp;query=Via+Mauro+Macchi+8+Milano" rel="noopener">%(v)s — %(c)s</a></div>
+    <div class="item"><small>PEC</small><a href="mailto:%(p)s">%(p)s</a></div>
     <div class="item"><small>Cosa succede dopo</small><p class="small" style="margin:6px 0 0">Vi rispondiamo entro due giorni lavorativi per fissare un primo confronto. Se ha senso proseguire, raccogliamo le fatture degli ultimi dodici mesi e in circa quattro settimane vi restituiamo la mappa energetica dell’impresa, con una stima del valore recuperabile.</p></div>
     <div class="item"><small>Riservatezza</small><p class="small" style="margin:6px 0 0">Tutto ciò che condividete resta tra noi. Su richiesta firmiamo un accordo di riservatezza prima ancora del primo incontro.</p></div>
     <div class="item"><small>Cosa serve per iniziare</small><p class="small" style="margin:6px 0 0">Le ultime fatture di energia elettrica e gas, i contratti di fornitura attivi e, se disponibile, la curva di carico oraria. Al resto pensiamo noi.</p></div>
   </div>
-</div></div></section>""" % {"b": BASE, "a": arrow(), "m": CONTACT_EMAIL})
+</div></div></section>""" % {"b": BASE, "a": arrow(), "m": CONTACT_EMAIL, "p": PEC, "v": VIA, "c": CITTA})
     return "".join(b)
 
 # ================================================================== LEGALI
-LEGAL_NOTE = "<p class=\"small muted\">Titolare del trattamento: Studio Green Capital SRL — [sede legale] — P.IVA [da inserire] — %s</p>" % CONTACT_EMAIL
+LEGAL_NOTE = ('<div class="dl" style="margin:0 0 36px"><div><dt>Titolare</dt><dd>Studio Green Capital SRL</dd></div>'
+              '<div><dt>Sede legale</dt><dd>%s — %s</dd></div>'
+              '<div><dt>C.F. e P.IVA</dt><dd>%s</dd></div><div><dt>REA</dt><dd>%s</dd></div>'
+              '<div><dt>PEC</dt><dd><a href="mailto:%s">%s</a></dd></div>'
+              '<div><dt>Email</dt><dd><a href="mailto:%s">%s</a></dd></div></div>'
+              ) % (VIA, CITTA, PIVA, REA, PEC, PEC, CONTACT_EMAIL, CONTACT_EMAIL)
 
 def privacy():
     b = [phero("Informativa", "Privacy policy", "Informativa sul trattamento dei dati personali ai sensi del Regolamento (UE) 2016/679 (GDPR).", crumbs=[("Home", BASE + "/"), ("Privacy", None)])]
@@ -542,7 +556,7 @@ def privacy():
 <section class="sec light"><div class="wrap"><div class="prose">
 %s
 <h2>1. Titolare del trattamento</h2>
-<p>Il titolare del trattamento è Studio Green Capital SRL (di seguito “il Titolare”), contattabile all’indirizzo email indicato sopra.</p>
+<p>Il titolare del trattamento è Studio Green Capital SRL, con sede in Via Mauro Macchi, 8 — 20124 Milano (MI) (di seguito “il Titolare”), contattabile agli indirizzi indicati sopra.</p>
 <h2>2. Dati trattati</h2>
 <p><strong>Dati di navigazione.</strong> I sistemi informatici che ospitano questo sito acquisiscono, nel normale funzionamento, alcuni dati tecnici la cui trasmissione è implicita nell’uso di internet (indirizzi IP, tipo di browser, orario della richiesta). Sono utilizzati esclusivamente per garantire il funzionamento e la sicurezza del sito e non sono associati a persone identificate.</p>
 <p><strong>Dati forniti volontariamente.</strong> Il modulo di contatto apre il programma di posta dell’utente con un messaggio precompilato: i dati inseriti (azienda, nome, email, telefono, settore, consumi, messaggio) sono trasmessi dall’utente stesso via email e trattati dal Titolare al solo fine di rispondere alla richiesta.</p>
@@ -602,7 +616,6 @@ def main():
     open(os.path.join(ROOT, "404.html"), "w", encoding="utf-8").write(html404)
 
     # favicon, sitemap, robots
-    open(os.path.join(ROOT, "assets", "favicon.svg"), "w", encoding="utf-8").write('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#0F2A1F"/><path d="M11 29c0-9 6.5-16 18-16-1 10-7.5 16-18 16z" fill="#B08A45"/><path d="M11 29c3.5-5.5 8-10 13.5-12.5" fill="none" stroke="#0A1B14" stroke-width="1.4" stroke-linecap="round" stroke-opacity=".8"/></svg>')
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join("  <url><loc>%s%s</loc></url>\n" % (SITE_URL, p) for p in pages) + "</urlset>\n"
     open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8").write(sm)
     open(os.path.join(ROOT, "robots.txt"), "w", encoding="utf-8").write("User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n" % SITE_URL)
