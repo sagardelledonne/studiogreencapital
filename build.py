@@ -4,7 +4,7 @@ Uso:  python build.py     -> scrive index.html e le cartelle delle pagine intern
 Pubblicazione: commit + push su main (GitHub Pages fa il resto).
 Con il dominio proprio (studiogreencapital.it) mettere BASE = "" e rigenerare.
 """
-import os, re
+import os, re, json
 
 BASE = "/studiogreencapital"          # prefisso degli indirizzi su GitHub Pages; "" con il dominio proprio
 SITE_URL = "https://sagardelledonne.github.io" + BASE
@@ -150,7 +150,7 @@ def footer():
 """.replace("%s", brand(), 1) % {"b": BASE, "s": srv, "m": CONTACT_EMAIL, "p": PEC, "v": VIA, "c": CITTA, "iva": PIVA, "rea": REA}
 
 # ------------------------------------------------------------------ pagina
-def page(path, title, desc, body, light=False):
+def page(path, title, desc, body, light=False, extra_js=""):
     """path: indirizzo (es. '/chi-siamo/'). Scrive index.html nella cartella corrispondente."""
     full = BASE + path
     canon = SITE_URL + path
@@ -179,10 +179,10 @@ def page(path, title, desc, body, light=False):
 %s
 </main>
 %s
-<script src="%s/assets/site.js%s" defer></script>
+<script src="%s/assets/site.js%s" defer></script>%s
 </body>
 </html>
-""" % (cls, title, desc, canon, title, desc, og_img, BASE, BASE, BASE, BASE, BASE, V, ICONS, header(full), body, footer(), BASE, V)
+""" % (cls, title, desc, canon, title, desc, og_img, BASE, BASE, BASE, BASE, BASE, V, ICONS, header(full), body, footer(), BASE, V, extra_js)
     out = os.path.join(ROOT, *[p for p in path.split("/") if p])
     os.makedirs(out, exist_ok=True)
     with open(os.path.join(out, "index.html"), "w", encoding="utf-8") as f:
@@ -221,24 +221,47 @@ def steps(light=False):
 def checks(items, x=False):
     return '<ul class="checks%s">%s</ul>' % (" x" if x else "", "".join('<li>%s<span>%s</span></li>' % (ico("i-no" if x else "i-check"), t) for t in items))
 
-def pun_chart():
-    """Grafico del prezzo medio annuo dell’elettricità in Italia (PUN, €/MWh)."""
-    data = [(2016, 43), (2017, 54), (2018, 61), (2019, 52), (2020, 39), (2021, 125), (2022, 304), (2023, 127), (2024, 108), (2025, 110)]
-    W, H, L, R, T, B = 900, 380, 56, 24, 30, 46
-    ymax = 350
-    def x(i): return L + i * (W - L - R) / (len(data) - 1)
-    def y(v): return T + (H - T - B) * (1 - v / ymax)
-    pts = [(x(i), y(v)) for i, (_, v) in enumerate(data)]
-    path = "M" + " L".join("%.1f %.1f" % p for p in pts)
-    area = path + " L%.1f %.1f L%.1f %.1f Z" % (pts[-1][0], y(0), pts[0][0], y(0))
-    grid = "".join('<line x1="%d" x2="%d" y1="%.1f" y2="%.1f"/><text class="lbl" x="%d" y="%.1f" text-anchor="end">%d</text>' % (L, W - R, y(v), y(v), L - 10, y(v) + 4, v) for v in range(0, ymax + 1, 50))
-    xl = "".join('<text class="lbl" x="%.1f" y="%d" text-anchor="middle">%d</text>' % (x(i), H - 14, yr) for i, (yr, _) in enumerate(data))
-    dots = "".join('<circle class="pt%s" cx="%.1f" cy="%.1f" r="%d"/>' % (" peak" if v == 304 else "", px, py, 6 if v == 304 else 4) for (px, py), (_, v) in zip(pts, data))
-    vals = "".join('<text class="val" x="%.1f" y="%.1f" text-anchor="middle">%d</text>' % (px, py - 12, v) for (px, py), (_, v) in zip(pts, data) if v in (39, 304, 110))
-    call = '<text class="call" x="%.1f" y="%.1f" text-anchor="end">×8 in ventiquattro mesi</text>' % (pts[6][0] - 16, pts[6][1] + 6)
-    return """<svg class="chart" viewBox="0 0 %d %d" role="img" aria-label="Prezzo medio annuo dell’energia elettrica in Italia dal 2016 al 2025: da 39 euro al megawattora nel 2020 a 304 nel 2022">
-<defs><linearGradient id="gArea" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#2E7A5A" stop-opacity=".28"/><stop offset="1" stop-color="#2E7A5A" stop-opacity="0"/></linearGradient></defs>
-<g class="grid">%s</g>%s<path class="area" d="%s"/><path class="line" d="%s"/>%s%s%s</svg>""" % (W, H, grid, xl, area, path, dots, vals, call)
+def grafico_prezzi():
+    """Sezione interattiva con i prezzi mensili di elettricità e gas (dati GME)."""
+    d = json.load(open(os.path.join(ROOT, "dati", "prezzi-gme.json"), encoding="utf-8"))
+    n, ultimo = len(d["mesi"]), d["mesi"][-1]
+    MESI = ["gennaio","febbraio","marzo","aprile","maggio","giugno","luglio","agosto","settembre","ottobre","novembre","dicembre"]
+    agg = "%s %s" % (MESI[int(ultimo[4:]) - 1], ultimo[:4])
+    # tabella di ripiego per chi non ha JavaScript e per i motori di ricerca
+    righe = "".join("<tr><th scope=\"row\">%s/%s</th><td>%s</td><td>%s</td></tr>"
+                    % (m[4:], m[:4], ("%.2f" % e).replace(".", ","), ("%.2f" % g).replace(".", ","))
+                    for m, e, g in zip(d["mesi"], d["elettricita"], d["gas"]))
+    return """
+<div class="gr" id="grafico">
+  <div class="gr-top">
+    <div class="gr-legend">
+      <button type="button" data-serie="el" aria-pressed="true"><i style="background:#0B4130"></i>Energia elettrica · PUN</button>
+      <button type="button" data-serie="gas" aria-pressed="true"><i style="background:#B5791C"></i>Gas naturale · PSV</button>
+    </div>
+    <div class="gr-range" role="group" aria-label="Periodo">
+      <button type="button" data-anni="10" aria-pressed="true">10 anni</button>
+      <button type="button" data-anni="5" aria-pressed="false">5 anni</button>
+      <button type="button" data-anni="3" aria-pressed="false">3 anni</button>
+      <button type="button" data-anni="1" aria-pressed="false">12 mesi</button>
+    </div>
+  </div>
+  <div class="gr-plot"><div class="gr-tip" id="gr-tip" hidden></div></div>
+  <dl class="gr-cards">
+    <div><dt>Minimo</dt><dd id="gr-min">—</dd><p id="gr-min-m"></p></div>
+    <div><dt>Massimo</dt><dd id="gr-max">—</dd><p id="gr-max-m"></p></div>
+    <div><dt>Ultimo dato</dt><dd id="gr-oggi">—</dd><p id="gr-oggi-m"></p></div>
+    <div><dt>Escursione</dt><dd id="gr-volt">—</dd><p>fra il mese più caro e il più economico</p></div>
+  </dl>
+  <div class="gr-sim">
+    <div>
+      <label for="gr-consumo">Quanto consuma la vostra impresa? <strong id="gr-consumo-v">5 GWh</strong> l’anno</label>
+      <input type="range" id="gr-consumo" min="1" max="50" step="1" value="5" aria-describedby="gr-impatto">
+    </div>
+    <div class="gr-out"><b id="gr-impatto">—</b><span>è la differenza di spesa fra un anno ai prezzi minimi e uno ai prezzi massimi del periodo scelto. A parità di produzione.</span></div>
+  </div>
+  <p class="gr-note">Prezzi medi mensili all’ingrosso, %(n)d mesi fino a %(agg)s. Energia elettrica: PUN del Mercato del Giorno Prima. Gas naturale: prezzo del Mercato del Giorno Prima del gas, consegna al PSV. Entrambi in €/MWh, quindi direttamente confrontabili. Fonte: <a href="https://www.mercatoelettrico.org" rel="noopener">Gestore dei Mercati Energetici (GME)</a>.</p>
+  <noscript><table class="gr-tab"><caption>Prezzi medi mensili in €/MWh — fonte GME</caption><thead><tr><th>Mese</th><th>Elettricità</th><th>Gas</th></tr></thead><tbody>%(righe)s</tbody></table></noscript>
+</div>""" % {"n": n, "agg": agg, "righe": righe}
 
 # ================================================================== HOME
 def home():
@@ -251,7 +274,7 @@ def home():
       <p class="eyebrow rv in">Energy, Land, People</p>
       <h1 class="rv in">L’energia non si subisce. <em>Si governa.</em></h1>
       <p class="lede rv in rv-d1">Affianchiamo imprese e gruppi industriali nelle decisioni che determinano il costo dell’energia: contratti, approvvigionamento, produzione propria. Un solo interlocutore, indipendente, remunerato sui risultati.</p>
-      <div class="actions rv in rv-d2"><a class="btn btn-brass" href="%(b)s/contatti/">Richiedi una valutazione %(a)s</a><a class="btn btn-ghost" href="%(b)s/metodo/">Come lavoriamo</a></div>
+      <div class="actions rv in rv-d2"><a class="btn btn-brass" href="%(b)s/contatti/">Richiedi una valutazione %(a)s</a><a class="btn btn-ghost" href="#mercato">Guarda i prezzi</a></div>
     </div>
     <aside class="rv in rv-d3"><strong>Advisor, non fornitori.</strong>Nessun prodotto da vendere, nessuna provvigione dai fornitori. Il nostro interesse coincide con il vostro: un costo dell’energia più basso e più prevedibile.</aside>
   </div>
@@ -267,7 +290,7 @@ def home():
     b.append("""
 <section class="stats"><div class="wrap">
   <div class="stat rv"><b data-count="25" data-prefix="10–" data-suffix="%">10–25%</b><p>di riduzione strutturale del costo energetico ottenibile con una strategia integrata</p></div>
-  <div class="stat rv rv-d1"><b data-count="8" data-prefix="×">×8</b><p>la variazione del prezzo dell’elettricità in Italia in ventiquattro mesi, tra il 2020 e il 2022</p></div>
+  <div class="stat rv rv-d1"><b data-count="25" data-prefix="×">×25</b><p>fra il mese più economico e quello più caro dell’ultimo decennio: da 22 a 543 €/MWh</p></div>
   <div class="stat rv rv-d2"><b data-count="75" data-suffix="%">75%</b><p>della bolletta dipende da materia prima e margine del fornitore: la parte su cui si può intervenire</p></div>
   <div class="stat rv rv-d3"><b>0</b><p>prodotti da vendere. Siamo advisor indipendenti, non fornitori né installatori</p></div>
 </div></section>""")
@@ -286,15 +309,10 @@ def home():
 </div></section>""" % (steps(), BASE, arrow()))
 
     b.append("""
-<section class="sec light"><div class="wrap">
-  <div class="split wide-r">
-    <div class="sticky rv"><p class="eyebrow">Il contesto</p><h2>La volatilità non è un incidente. <em>È la normalità</em> del mercato.</h2><p class="lede" style="margin-top:20px">Prezzo medio annuo dell’energia elettrica all’ingrosso in Italia. Chi compra senza una strategia paga queste oscillazioni per intero, e le scopre in fattura.</p></div>
-    <div class="rv rv-d1">
-      <div class="chart-wrap">%s<p class="source">PUN, media annua in €/MWh, valori arrotondati. Fonte: GME.</p></div>
-      <div class="callout"><b>1,3 mln €</b><p>Per un’impresa che consuma 5 GWh l’anno, la differenza tra il prezzo del 2020 e quello del 2022 ha significato oltre 1,3 milioni di euro di costo aggiuntivo in dodici mesi. Senza aver cambiato nulla nel modo di produrre.</p></div>
-    </div>
-  </div>
-</div></section>""" % pun_chart())
+<section class="sec light" id="mercato"><div class="wrap">
+  <div class="head rv" style="max-width:820px"><p class="eyebrow">Il contesto</p><h2>Per un’impresa energivora, <em>la volatilità è il vero costo.</em></h2><p class="lede">Dieci anni di prezzi all’ingrosso, mese per mese, dai dati ufficiali del GME. Chi compra senza una strategia non paga un prezzo: paga qualunque prezzo decida il mercato, e lo scopre in fattura.</p></div>
+  %s
+</div></section>""" % grafico_prezzi())
 
     b.append("""
 <section class="sec paper light"><div class="wrap">
@@ -596,7 +614,9 @@ def not_found():
 # ================================================================== generazione
 def main():
     pages = []
-    pages.append(page("/", "Studio Green Capital — Consulenza energetica strategica per le imprese", "Advisor indipendenti per la gestione strategica dell’energia: contratti, PPA, fotovoltaico e autoconsumo, efficienza. Riduciamo il costo dell’energia e lo rendiamo prevedibile.", home()))
+    JS_GRAFICO = ('<script src="%s/assets/prezzi.js%s" defer></script>'
+                  '<script src="%s/assets/grafico.js%s" defer></script>') % (BASE, V, BASE, V)
+    pages.append(page("/", "Studio Green Capital — Consulenza energetica strategica per le imprese", "Advisor indipendenti per la gestione strategica dell’energia: contratti, PPA, fotovoltaico e autoconsumo, efficienza. Riduciamo il costo dell’energia e lo rendiamo prevedibile.", home(), extra_js=JS_GRAFICO))
     pages.append(page("/chi-siamo/", "Chi siamo — Studio Green Capital", "Società di consulenza energetica indipendente, spin-off italiano di InSSIDe World Inc. Nessun prodotto da vendere: solo decisioni migliori, misurate sui risultati.", chi_siamo()))
     pages.append(page("/servizi/", "Servizi — Studio Green Capital", "Supply & procurement, PPA, produzione e autoconsumo, efficienza energetica, welfare energetico: ogni leva che decide il costo dell’energia della vostra impresa.", servizi()))
     for i, s in enumerate(SERVICES):
@@ -619,6 +639,10 @@ def main():
     sm = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' + "".join("  <url><loc>%s%s</loc></url>\n" % (SITE_URL, p) for p in pages) + "</urlset>\n"
     open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8").write(sm)
     open(os.path.join(ROOT, "robots.txt"), "w", encoding="utf-8").write("User-agent: *\nAllow: /\nSitemap: %s/sitemap.xml\n" % SITE_URL)
+    d = json.load(open(os.path.join(ROOT, "dati", "prezzi-gme.json"), encoding="utf-8"))
+    open(os.path.join(ROOT, "assets", "prezzi.js"), "w", encoding="utf-8").write(
+        ("/* Prezzi medi mensili all'ingrosso, EUR/MWh. Fonte: GME (%s), scaricati il %s.\n   Generato da build.py a partire da dati/prezzi-gme.json. */\nwindow.PREZZI=%s;\n")
+        % (d["fonte"], d["scaricato"], json.dumps({"mesi": d["mesi"], "elettricita": d["elettricita"], "gas": d["gas"]}, separators=(",", ":"))))
     open(os.path.join(ROOT, ".nojekyll"), "w").write("")
     print("Generate %d pagine + 404, sitemap, robots." % len(pages))
 
