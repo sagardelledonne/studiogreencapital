@@ -428,3 +428,41 @@ section{position:relative}
   .gr-lbl{font-size:17px}
   .gr-peak-lbl{font-size:17px}
 }
+
+/* ---------- simulatore ---------- */
+.sim{background:var(--g900);color:#fff;border-radius:var(--r-lg);padding:clamp(28px,4vw,52px);margin-top:clamp(40px,5vw,64px)}
+.sim h3{color:#fff;margin-bottom:10px}
+.sim .sim-intro{color:rgba(255,255,255,.75);max-width:62ch;margin-bottom:32px}
+.sim-in{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding-bottom:32px;border-bottom:1px solid var(--line-d)}
+.sim-in label{display:block;font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--brass2);margin-bottom:10px}
+.sim-in .campo{position:relative}
+.sim-in input{width:100%;font:inherit;font-family:var(--serif);font-weight:300;font-size:1.9rem;letter-spacing:-.02em;padding:10px 64px 10px 0;border:0;border-bottom:2px solid rgba(255,255,255,.25);background:transparent;color:#fff;transition:border-color .2s}
+.sim-in input:focus{outline:0;border-color:var(--brass2)}
+.sim-in .um{position:absolute;right:0;bottom:16px;font-size:.88rem;color:rgba(255,255,255,.6)}
+.sim-in .nota{font-size:.78rem;color:rgba(255,255,255,.5);margin-top:8px}
+.sim-out{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(28px,4vw,56px);padding-top:32px}
+.sim-conto{display:grid;gap:2px}
+.sim-riga{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:baseline;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.sim-riga span{color:rgba(255,255,255,.72);font-size:.95rem}
+.sim-riga b{font-family:var(--serif);font-weight:400;font-size:1.15rem;white-space:nowrap}
+.sim-riga b small{font-family:var(--sans);font-size:.72rem;font-weight:600;color:rgba(255,255,255,.55);margin-left:3px}
+.sim-riga.forte{border-bottom:0;padding-top:20px}
+.sim-riga.forte span{color:#fff;font-weight:700}
+.sim-riga.forte b{color:var(--brass2);font-size:1.9rem;font-weight:300;letter-spacing:-.02em}
+.sim-big{text-align:center;padding:26px 20px;border-radius:var(--r);background:rgba(178,207,73,.12);margin-bottom:24px}
+.sim-big b{display:block;font-family:var(--serif);font-weight:300;font-size:clamp(3rem,7vw,4.6rem);line-height:1;color:var(--brass2);letter-spacing:-.04em}
+.sim-big span{display:block;font-size:.9rem;color:rgba(255,255,255,.75);margin-top:10px}
+.sim-barra{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:6px 0 12px;background:rgba(255,255,255,.1)}
+.sim-barra i{display:block;transition:width .35s var(--ease)}
+#sim-barra-contratto{background:var(--brass2)}
+#sim-barra-autocons{background:#4E8A63}
+.sim-leg{display:flex;gap:20px;flex-wrap:wrap;font-size:.84rem;color:rgba(255,255,255,.7);margin-bottom:10px}
+.sim-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px}
+.sim-quote{font-size:.92rem;color:rgba(255,255,255,.78);line-height:1.5}
+.sim-ip{margin-top:28px;padding-top:22px;border-top:1px solid var(--line-d);font-size:.82rem;color:rgba(255,255,255,.55);line-height:1.6}
+@media (max-width:860px){.sim-out{grid-template-columns:1fr}}
+@media (max-width:640px){
+  .sim-in{grid-template-columns:1fr;gap:24px}
+  .sim-in input{font-size:1.6rem}
+  .sim-riga b{font-size:1.05rem}
+}

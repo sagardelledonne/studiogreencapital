@@ -42,6 +42,11 @@ MARK = ('<img class="mark light" src="%(b)s/assets/img/simbolo-chiaro.webp" widt
 def ico(name):
     return '<svg aria-hidden="true"><use href="#%s"/></svg>' % name
 
+def blocco(nome):
+    """Legge un pezzo di pagina da blocchi/<nome>.html (comodo per i blocchi lunghi)."""
+    with open(os.path.join(ROOT, "blocchi", nome + ".html"), encoding="utf-8") as f:
+        return f.read()
+
 def arrow():
     return ico("i-arrow")
 
@@ -51,9 +56,9 @@ SERVICES = [
          teaser="Struttura contrattuale, momento di acquisto, negoziazione. Il prezzo dell’energia è una decisione, non una fortuna.",
          lede="Il contratto di fornitura è la prima leva sul costo dell’energia, e quasi sempre la meno governata. Lo trasformiamo in una scelta consapevole: quale struttura, quando fissare, con chi.",
          problem="La maggior parte delle imprese rinnova la fornitura a ridosso della scadenza, confrontando due o tre offerte su un prezzo che nel frattempo è già cambiato. Il contratto resta una casella da spuntare, con clausole poco lette e un’esposizione al mercato che nessuno ha scelto davvero.",
-         answer="Trattiamo l’acquisto dell’energia come una decisione finanziaria. Analizziamo il profilo di prelievo, costruiamo la struttura contrattuale più adatta (fisso, indicizzato, a tranche, mix), scegliamo il momento in base al mercato e gestiamo la gara tra i fornitori. Voi firmate un contratto che avete capito e voluto.",
-         do=["Analisi del profilo di consumo e della struttura di costo attuale", "Definizione della strategia: prodotto, orizzonte, quota fissata", "Gara tra fornitori qualificati e negoziazione delle clausole", "Presidio delle finestre di fissazione del prezzo durante l’anno", "Verifica delle fatture e recupero di eventuali errori"],
-         get=[("Prezzo migliore", "Condizioni ottenute confrontando il mercato nel momento giusto, non solo a scadenza."), ("Rischio scelto", "Un’esposizione alla volatilità decisa a tavolino, coerente con i vostri margini."), ("Zero sorprese", "Clausole chiare, fatture controllate, nessun costo nascosto.")],
+         answer="Trattiamo l’acquisto dell’energia come una decisione finanziaria. Analizziamo il profilo di prelievo, costruiamo la struttura contrattuale più adatta (fisso, indicizzato, a tranche, mix), scegliamo il momento in base al mercato e gestiamo la gara tra i fornitori. E ci sediamo a quel tavolo con il volume aggregato di tutti i clienti che seguiamo: è la differenza fra chiedere un preventivo e avere un potere negoziale. Voi firmate un contratto che avete capito e voluto.",
+         do=["Analisi del profilo di consumo e della struttura di costo attuale", "Definizione della strategia: prodotto, orizzonte, quota fissata", "Negoziazione con i fornitori sul volume aggregato dei nostri clienti", "Gara tra fornitori qualificati e negoziazione delle clausole", "Presidio delle finestre di fissazione del prezzo durante l’anno", "Verifica delle fatture e recupero di eventuali errori"],
+         get=[("Prezzo migliore", "Condizioni ottenute sul volume aggregato e nel momento giusto del mercato, non solo a scadenza."), ("Rischio scelto", "Un’esposizione alla volatilità decisa a tavolino, coerente con i vostri margini."), ("Zero sorprese", "Clausole chiare, fatture controllate, nessun costo nascosto.")],
          who="Imprese con una spesa energetica significativa — indicativamente da 200.000 € l’anno — che oggi gestiscono la fornitura in modo reattivo."),
     dict(slug="ppa", n="02", title="PPA — Power Purchase Agreement", short="Accordi pluriennali con produttori rinnovabili", icon="i-ppa", img="fiume",
          teaser="Un prezzo stabile per anni, energia rinnovabile certificata, rischio sotto controllo. Senza costruire nulla.",
@@ -289,7 +294,7 @@ def home():
 
     b.append("""
 <section class="stats"><div class="wrap">
-  <div class="stat rv"><b data-count="25" data-prefix="10–" data-suffix="%">10–25%</b><p>di riduzione strutturale del costo energetico ottenibile con una strategia integrata</p></div>
+  <div class="stat rv"><b data-count="25" data-prefix="10–" data-suffix="%">10–25%</b><p>l’ordine di grandezza della riduzione ottenibile aggregando i volumi e ristrutturando i contratti</p></div>
   <div class="stat rv rv-d1"><b data-count="25" data-prefix="×">×25</b><p>fra il mese più economico e quello più caro dell’ultimo decennio: da 22 a 543 €/MWh</p></div>
   <div class="stat rv rv-d2"><b data-count="75" data-suffix="%">75%</b><p>della bolletta dipende da materia prima e margine del fornitore: la parte su cui si può intervenire</p></div>
   <div class="stat rv rv-d3"><b>0</b><p>prodotti da vendere. Siamo advisor indipendenti, non fornitori né installatori</p></div>
@@ -319,6 +324,7 @@ def home():
   <div class="split">
     <div class="sticky rv"><p class="eyebrow">Perché Studio Green Capital</p><h2>Non un broker. Non un installatore. <em>Un partner.</em></h2><p class="lede" style="margin-top:20px">Chi vende energia o impianti ha un interesse nel farvi comprare. Noi abbiamo un interesse solo: che il vostro costo scenda e resti sotto controllo.</p></div>
     <ol class="nlist rv rv-d1">
+      <li><div><h3>Il peso di molti, non di uno</h3><p>Trattiamo con i fornitori portando il volume aggregato di tutti i nostri clienti. Una singola impresa negozia per sé; noi negoziamo per un insieme, e otteniamo condizioni che da soli non sarebbero sul tavolo.</p></div></li>
       <li><div><h3>Indipendenza</h3><p>Nessun legame con fornitori, trader o installatori. Raccomandiamo ciò che conviene a voi, non ciò che conviene a qualcun altro.</p></div></li>
       <li><div><h3>Allineamento</h3><p>La nostra remunerazione è legata ai risultati che generiamo. Se il vostro costo non scende, non abbiamo fatto il nostro lavoro.</p></div></li>
       <li><div><h3>Rigore</h3><p>Ogni raccomandazione parte dai dati: profili di consumo, curve di prezzo, scenari. Niente sensazioni, solo numeri verificabili.</p></div></li>
@@ -358,7 +364,8 @@ def chi_siamo():
     <p>Negli ultimi anni il costo dell’energia ha smesso di essere una voce prevedibile del conto economico. Prezzi che si moltiplicano in pochi mesi, contratti sempre più complessi, mercati all’ingrosso che entrano direttamente in fattura: per molte imprese l’energia è passata da costo di gestione a fattore di rischio.</p>
     <p>Eppure, dentro le aziende, chi se ne occupa è quasi sempre qualcuno che fa anche altro. L’ufficio acquisti, l’amministrazione, il titolare. Persone competenti nel loro lavoro, che affrontano un mercato specialistico con gli strumenti di un rinnovo contrattuale qualsiasi. Dall’altra parte del tavolo, invece, siedono professionisti che di energia si occupano tutto il giorno.</p>
     <p>Studio Green Capital nasce per riequilibrare quel tavolo. Portiamo nelle imprese competenze di mercato, contrattualistica e ingegneria energetica, con un modello che non prevede la vendita di nulla: né energia, né impianti, né prodotti finanziari. Solo decisioni migliori, misurate sui risultati.</p>
-    <p>Siamo lo spin-off italiano di InSSIDe World Inc., da cui ereditiamo metodo e visione internazionale, applicati alla realtà delle imprese italiane: manifattura, logistica, servizi, gruppi multi-sito.</p>
+    <p>Non nasciamo dal nulla. Studio Green Capital è lo spin-off italiano di InSSIDe World Inc., società del gruppo GHST World che sviluppa e realizza impianti di produzione rinnovabile in Italia — fotovoltaico e idroelettrico — con l’obiettivo di portare in esercizio 100 MW di capacità. Significa che dietro le nostre analisi c’è chi gli impianti li costruisce davvero, e conosce il costo reale di un kilowattora prodotto, non solo quello di un kilowattora comprato.</p>
+    <p>Da quel mondo ereditiamo il metodo; l’applichiamo alla realtà delle imprese italiane: manifattura, logistica, servizi, gruppi multi-sito.</p>
   </div>
 </div></div></section>""")
     b.append("""
@@ -384,7 +391,7 @@ def chi_siamo():
   <div class="rv rv-d1">%s</div>
 </div></div></section>""" % checks(["<strong>Non vendiamo energia.</strong> Non siamo un fornitore né un broker: non abbiamo tariffe da piazzare.",
                                      "<strong>Non installiamo impianti.</strong> Progettiamo e verifichiamo, poi mettiamo in gara chi li realizza.",
-                                     "<strong>Non incassiamo provvigioni nascoste.</strong> La nostra remunerazione la vedete e la decidete voi con noi.",
+                                     "<strong>Non incassiamo provvigioni dai fornitori</strong> sulle forniture della vostra impresa. La nostra remunerazione la vedete e la decidete voi con noi.",
                                      "<strong>Non proponiamo soluzioni standard.</strong> Ogni impresa ha un profilo energetico diverso: il piano lo costruiamo su quello."], x=True))
     b.append(cta_band("Parliamo della <em>vostra</em> situazione energetica.", "Un primo confronto riservato per capire se e quanto possiamo essere utili. Senza impegno, senza vendite."))
     return "".join(b)
@@ -482,14 +489,14 @@ def metodo():
 # ================================================================== RISULTATI
 def risultati():
     b = [phero("Risultati", "I numeri prima, <em>le parole dopo.</em>",
-               "Ogni mandato ha obiettivi misurabili definiti all’inizio e verificati alla fine. Qui raccontiamo come lavoriamo attraverso un caso concreto, con il consenso del cliente.",
+               "Ogni mandato ha obiettivi misurabili definiti all’inizio e verificati alla fine. Qui mostriamo, numeri alla mano, cosa cambia per un’impresa energivora che adotta questo approccio — e potete rifare il conto sui vostri consumi.",
                crumbs=[("Home", BASE + "/"), ("Risultati", None)], img="fotovoltaico")]
     b.append("""
 <section class="sec light"><div class="wrap">
-  <p class="eyebrow rv">Caso · Manifatturiero</p>
+  <p class="eyebrow rv">Scenario · Manifatturiero</p>
   <div class="split" style="align-items:stretch">
     <div class="rv">
-      <h2>Un’azienda manifatturiera del Nord Italia, <em>3,8 GWh l’anno.</em></h2>
+      <h2>Un’impresa manifatturiera da <em>3,8 GWh l’anno.</em></h2>
       <dl class="dl" style="margin-top:32px">
         <div><dt>Settore</dt><dd>Manifatturiero, produzione continua</dd></div>
         <div><dt>Localizzazione</dt><dd>Nord Italia</dd></div>
@@ -499,11 +506,11 @@ def risultati():
     </div>
     <div class="prose rv rv-d1">
       <h3 style="margin-top:0">La situazione di partenza</h3>
-      <p>Contratto di fornitura rinnovato ogni anno a ridosso della scadenza, con prezzo interamente indicizzato al mercato. Nessuna strategia di copertura. Coperture dello stabilimento inutilizzate. Nel 2022 la spesa energetica era più che raddoppiata rispetto a due anni prima, senza alcun cambiamento nella produzione.</p>
+      <p>È la condizione in cui si trova gran parte delle imprese energivore: contratto rinnovato ogni anno a ridosso della scadenza, prezzo interamente indicizzato al mercato, nessuna strategia di copertura, coperture dello stabilimento inutilizzate. Nel 2022 una spesa energetica così strutturata è più che raddoppiata rispetto a due anni prima, senza alcun cambiamento nella produzione.</p>
       <h3>L’intervento</h3>
-      <p>Abbiamo ridefinito da capo la strategia di acquisto: rinegoziazione dei contratti in essere, nuova struttura con una quota di prezzo fissata in finestre pianificate e una copertura del rischio sulla parte restante. In parallelo, studio di fattibilità e realizzazione di un impianto fotovoltaico da 1 MWp in autoconsumo, con gara tra installatori e verifica indipendente delle offerte.</p>
+      <p>Si ridefinisce da capo la strategia di acquisto: rinegoziazione dei contratti in essere, nuova struttura con una quota di prezzo fissata in finestre pianificate e una copertura del rischio sulla parte restante. In parallelo, studio di fattibilità e realizzazione di un impianto fotovoltaico da 1 MWp in autoconsumo, con gara tra installatori e verifica indipendente delle offerte.</p>
       <h3>Il risultato</h3>
-      <p>Costo unitario dell’energia acquistata ridotto del 15%. Grazie all’autoconsumo e alla nuova struttura contrattuale, spesa energetica complessiva ridotta del 55%. Ma soprattutto: una spesa oggi prevedibile, con un’esposizione al mercato scelta e non subita, e un margine operativo protetto anche nei mesi di prezzo alto.</p>
+      <p>Costo unitario dell’energia acquistata più basso del 15%. Sommando l’autoconsumo e la nuova struttura contrattuale, la spesa complessiva scende in modo molto più marcato. Ma il risultato che conta non è solo il numero: è una spesa prevedibile, con un’esposizione al mercato scelta e non subita, e un margine protetto anche nei mesi di prezzo alto.</p>
     </div>
   </div>
   <div class="kpis light rv" style="grid-template-columns:repeat(4,1fr);margin-top:56px">
@@ -513,6 +520,7 @@ def risultati():
     <div class="kpi"><b>1</b><span>interlocutore per l’intero progetto</span></div>
   </div>
 </div></section>""")
+    b.append(blocco("simulatore"))
     b.append("""
 <section class="sec dark"><div class="wrap"><div class="split">
   <div class="sticky rv"><p class="eyebrow">Cosa misuriamo</p><h2>Gli indicatori che <em>contano davvero.</em></h2><p class="lede" style="margin-top:20px">Il risparmio in bolletta è solo uno dei numeri. Un’impresa che governa l’energia guarda anche agli altri.</p></div>
@@ -524,7 +532,7 @@ def risultati():
   </ol>
 </div></div></section>""")
     b.append("""
-<section class="sec-sm light"><div class="wrap"><div class="panel rv" style="max-width:820px"><p class="eyebrow">Una nota</p><h3>Perché pubblichiamo pochi casi</h3><p>Lavoriamo su dati sensibili — costi, contratti, piani industriali — e ogni mandato è coperto da riservatezza. Pubblichiamo solo i casi per cui il cliente ha dato il consenso esplicito, in forma anonima. In un incontro riservato possiamo raccontarvi molto di più.</p></div></div></section>""")
+<section class="sec-sm light"><div class="wrap"><div class="panel rv" style="max-width:860px"><p class="eyebrow">Come leggere questi numeri</p><h3>Le ipotesi, in chiaro</h3><p>Lo scenario qui sopra è costruito su prezzi di mercato reali (serie mensile GME) e su ipotesi tecniche standard: un impianto da 1 MWp in Nord Italia produce indicativamente 1,1–1,2 GWh l’anno, di cui si autoconsuma la quota compatibile con il profilo di prelievo. Il risultato finale dipende da tre leve che pesano in modo diverso: quanto viene dal mercato, quanto dalla struttura contrattuale, quanto dall’autoconsumo.</p><p>Preferiamo mostrarle che nasconderle: i numeri di un’impresa non sono quelli di un’altra, e un risparmio che non si sa da dove arriva non è un risparmio governabile. Con i vostri consumi reali facciamo lo stesso conto in un’ora.</p><p style="margin-bottom:0">Lavoriamo su dati sensibili — costi, contratti, piani industriali — e ogni mandato è coperto da riservatezza.</p></div></div></section>""")
     b.append(cta_band("Il prossimo caso potrebbe essere <em>il vostro.</em>", "Iniziamo da un’analisi preliminare: in poche settimane sapete quanto valore c’è da recuperare nella vostra impresa."))
     return "".join(b)
 
@@ -623,7 +631,8 @@ def main():
         t = re.sub(r"&amp;", "&", s["title"])
         pages.append(page("/servizi/%s/" % s["slug"], "%s — Studio Green Capital" % t, s["lede"][:155], servizio(s, i)))
     pages.append(page("/metodo/", "Il metodo — Studio Green Capital", "Analizziamo, strutturiamo, eseguiamo, presidiamo: un processo in quattro fasi che non finisce con la firma. Remunerazione legata ai risultati.", metodo()))
-    pages.append(page("/risultati/", "Risultati — Studio Green Capital", "Un caso concreto: azienda manifatturiera del Nord Italia, 3,8 GWh l’anno, −15% costo unitario e −55% spesa energetica complessiva.", risultati()))
+    JS_SIM = '<script src="%s/assets/simulatore.js%s" defer></script>' % (BASE, V)
+    pages.append(page("/risultati/", "Risultati — Studio Green Capital", "Un caso concreto: azienda manifatturiera del Nord Italia, 3,8 GWh l’anno. Simulate il vostro caso: consumo, spesa e superficie disponibile.", risultati(), extra_js=JS_SIM))
     pages.append(page("/contatti/", "Contatti — Studio Green Capital", "Richiedete una valutazione riservata e senza impegno della situazione energetica della vostra impresa.", contatti()))
     pages.append(page("/privacy/", "Privacy policy — Studio Green Capital", "Informativa sul trattamento dei dati personali.", privacy(), light=True))
     pages.append(page("/cookie/", "Cookie policy — Studio Green Capital", "Informativa sull’uso dei cookie.", cookie(), light=True))

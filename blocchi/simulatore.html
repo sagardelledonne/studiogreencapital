@@ -1,0 +1,44 @@
+<section class="sec-sm light"><div class="wrap">
+  <div class="head rv" style="max-width:820px"><p class="eyebrow">Fatelo sui vostri numeri</p><h2>Quanto cambierebbe <em>per voi.</em></h2><p class="lede">Tre dati che avete già in fattura. Il conto cambia mentre scrivete.</p></div>
+  <div class="sim rv" id="sim">
+    <div class="sim-in">
+      <div>
+        <label for="sim-consumo">Consumo annuo</label>
+        <div class="campo"><input type="number" id="sim-consumo" value="3.8" step="0.1" min="0.1" inputmode="decimal"><span class="um">GWh</span></div>
+        <p class="nota">In fattura è in kWh: 1 GWh = 1.000.000 kWh</p>
+      </div>
+      <div>
+        <label for="sim-spesa">Spesa annua per l’energia</label>
+        <div class="campo"><input type="number" id="sim-spesa" value="950" step="10" min="1" inputmode="numeric"><span class="um">mila €</span></div>
+        <p class="nota">Il totale speso per l’energia elettrica in un anno</p>
+      </div>
+      <div>
+        <label for="sim-superficie">Superficie disponibile</label>
+        <div class="campo"><input type="number" id="sim-superficie" value="7000" step="100" min="0" inputmode="numeric"><span class="um">m²</span></div>
+        <p class="nota">Coperture, tettoie, aree libere. Zero se non ne avete</p>
+      </div>
+    </div>
+    <div class="sim-out">
+      <div class="sim-conto">
+        <div class="sim-riga"><span>Quanto pagate l’energia oggi</span><b id="sim-unitario">—</b></div>
+        <div class="sim-riga"><span>Quanto la paghereste dopo</span><b id="sim-nuovo-unitario">—</b></div>
+        <div class="sim-riga"><span>Impianto installabile</span><b id="sim-kwp">—</b></div>
+        <div class="sim-riga"><span>Investimento indicativo</span><b id="sim-investimento">—</b></div>
+        <div class="sim-riga"><span>Rientro dell’investimento</span><b id="sim-rientro">—</b></div>
+        <div class="sim-riga"><span>Spesa annua oggi</span><b id="sim-spesa-oggi">—</b></div>
+        <div class="sim-riga forte"><span>Spesa annua dopo</span><b id="sim-spesa-dopo">—</b></div>
+      </div>
+      <div>
+        <div class="sim-big"><b id="sim-pct">—</b><span>di spesa energetica in meno ogni anno, pari a <strong id="sim-risparmio">—</strong></span></div>
+        <p style="font-size:.84rem;color:rgba(255,255,255,.7);margin-bottom:6px">Da dove arriva il risparmio</p>
+        <div class="sim-barra"><i id="sim-barra-contratto"></i><i id="sim-barra-autocons"></i></div>
+        <div class="sim-leg">
+          <span><i style="background:#B2CF49"></i>Struttura contrattuale · <b id="sim-da-contratto" style="font-weight:700"></b></span>
+          <span><i style="background:#4E8A63"></i>Autoconsumo · <b id="sim-da-autocons" style="font-weight:700"></b></span>
+        </div>
+        <p class="sim-quote" id="sim-quote"></p>
+      </div>
+    </div>
+    <p class="sim-ip">Ipotesi: 1.200 kWh prodotti per kWp all’anno (Nord Italia), 75% di autoconsumo, 7 m² di superficie per kWp, 850 €/kWp chiavi in mano, riduzione del 15% sul costo unitario dell’energia acquistata. L’impianto è dimensionato sul minore fra la superficie disponibile e il fabbisogno. Sono ordini di grandezza per capire se vale la pena approfondire, non un preventivo: il calcolo puntuale richiede il profilo orario dei consumi.</p>
+  </div>
+</div></section>
