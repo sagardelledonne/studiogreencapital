@@ -14,7 +14,7 @@
   --ease:cubic-bezier(.2,.7,.2,1);
 }
 *,*::before,*::after{box-sizing:border-box}
-html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;overflow-x:clip}
 body{margin:0;font-family:var(--sans);font-size:17px;line-height:1.65;color:var(--ink);background:var(--cream);-webkit-font-smoothing:antialiased;overflow-x:hidden}
 img{max-width:100%;display:block}
 a{color:inherit}
@@ -66,7 +66,7 @@ h1 em,h2 em,h3 em,.quote em{color:var(--brass2);font-style:normal;font-weight:60
 .brand{display:flex;align-items:center;gap:13px;text-decoration:none;font-family:var(--serif);font-size:1.12rem;letter-spacing:.01em;white-space:nowrap}
 .brand .mark{width:46px;height:auto;flex:none}
 .brand b{font-weight:600;display:block;line-height:1.1}
-.brand small{display:block;font-family:var(--sans);font-size:.58rem;letter-spacing:.22em;text-transform:uppercase;opacity:.75;font-weight:600;margin-top:4px;color:var(--brass2)}
+.brand small{display:block;font-family:var(--sans);font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;opacity:.75;font-weight:600;margin-top:4px;color:var(--brass2)}
 .on-light .brand small,.solid .brand small{color:var(--brass)}
 /* il marchio chiaro sui fondi scuri, quello a colori sui fondi chiari */
 .brand .mark.light{display:block}.brand .mark.dark{display:none}
@@ -87,8 +87,8 @@ h1 em,h2 em,h3 em,.quote em{color:var(--brass2);font-style:normal;font-weight:60
 .top .btn{padding:12px 20px;font-size:.9rem}
 .burger{display:none;width:44px;height:44px;border-radius:50%;border:1px solid currentColor;background:transparent;color:inherit;cursor:pointer;align-items:center;justify-content:center;opacity:.9}
 .burger svg{width:22px;height:22px}
-.menu{position:fixed;inset:0;z-index:60;background:var(--g950);color:#fff;padding:24px var(--gut);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .45s var(--ease);overflow:auto}
-.menu.open{transform:none}
+.menu{position:fixed;inset:0;z-index:60;background:var(--g950);color:#fff;padding:24px var(--gut);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .45s var(--ease),visibility .45s;overflow:auto;visibility:hidden}
+.menu.open{transform:none;visibility:visible}
 .menu .mhead{display:flex;justify-content:space-between;align-items:center;height:60px}
 .menu .close{width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;cursor:pointer;display:grid;place-items:center}
 .menu .close svg{width:22px;height:22px}
@@ -217,6 +217,7 @@ section{position:relative}
 .case .body h3{font-size:clamp(1.6rem,2.4vw,2.2rem);margin-bottom:14px}
 .case .body p{color:rgba(255,255,255,.75)}
 .kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0}
+.dl{overflow-wrap:anywhere}
 .kpi{border-top:1px solid var(--line-d);padding-top:14px}
 .kpi b{display:block;font-family:var(--serif);font-weight:300;font-size:2.1rem;line-height:1;color:var(--brass2);letter-spacing:-.03em}
 .kpi span{display:block;font-size:.85rem;color:rgba(255,255,255,.7);margin-top:6px}
@@ -329,13 +330,38 @@ section{position:relative}
 }
 @media (max-width:640px){
   body{font-size:16px}
+  /* aree di tocco comode: minimo 44px in altezza sui comandi */
+  .foot nav a{padding:11px 0}
+  .foot .legal nav{gap:24px}
+  .foot .legal nav a{padding:8px 0}
+  .link{padding:9px 0}
+  .crumbs{gap:14px}
+  .crumbs a{padding:6px 0;display:inline-block}
+  .gr-legend button,.gr-range button{padding:13px 16px}
+  .gr-range{width:100%}
+  .gr-range button{flex:1;text-align:center;padding:13px 6px}
+  .form .consent{align-items:center;gap:14px;padding:6px 0}
+  .form .consent input{width:24px;height:24px;margin-top:0}
+  .contact-aside .item{padding:26px 0}
+  .brand small{font-size:.7rem;letter-spacing:.14em}
+  .contact-aside a{padding:6px 0;display:inline-block}
+  .prose a,.gr-note a{padding:4px 0;display:inline-block}
+  .form .consent span{line-height:1.6}
+  .pn a{padding:22px 20px}
+  .nlist li{padding:26px 0}
+  /* l'apertura non deve superare lo schermo: si vedono subito i pulsanti */
+  .hero{min-height:auto}
+  .hero .wrap{padding:118px 0 54px}
+  .hero .lede{margin:22px 0 30px}
+  .hero aside{padding-left:20px}
+  .scroll-hint{display:none}
   .top .wrap{height:72px}
   .hero .wrap{padding:130px 0 60px}
   .stats .wrap{grid-template-columns:1fr}.stat{border-left:0;padding:26px 0;border-bottom:1px solid var(--line)}.stat:last-child{border-bottom:0}
   .grid3,.grid4,.grid2,.form,.pn,.tl,.dl{grid-template-columns:1fr}
   .steps{grid-template-columns:1fr}
   .manifesto .wrap{grid-template-columns:1fr}.manifesto .num{display:none}
-  .kpis{grid-template-columns:1fr 1fr}
+  .kpis,.kpis[style]{grid-template-columns:1fr 1fr!important}
   .callout{grid-template-columns:1fr}
   .nlist li{grid-template-columns:44px 1fr}
   .foot .cols{grid-template-columns:1fr}
